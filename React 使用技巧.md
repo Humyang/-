@@ -1,3 +1,7 @@
+# React 优点
+
+composability
+
 # 组件的设计
 
 设计优先级：布局 > 样式
