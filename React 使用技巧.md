@@ -1,6 +1,39 @@
+
+
+## radio 选中
+
+```javascript
+<tbody>
+                    <tr>
+                        <td><input type="radio" name="site_name"
+                                   value={result.SITE_NAME}
+                                   checked={this.state.site === result.SITE_NAME}
+                                   onChange={this.onSiteChanged} />{result.SITE_NAME}</td>
+                        <td><input type="radio" name="address"
+                                   value={result.ADDRESS}  
+                                   checked={this.state.address === result.ADDRESS}
+                                   onChange={this.onAddressChanged} />{result.ADDRESS}</td>
+                    </tr>
+               </tbody>
+```
+
+## React 组件默认值
+
+例如 radio 需要根据 state 控制默认值，可以这样做
+
+```javascript
+<input id='repayment-way-one' value="1" type="radio" defaultChecked= { this.state.value==="1" }  onChange={this.changeRepaymenyWay} name='repayment-way' />
+<input id='repayment-way-one' value="1" type="radio" defaultChecked= { this.state.value==="2" }  onChange={this.changeRepaymenyWay} name='repayment-way' />
+```
+
+
 # React 优点
 
 composability
+
+## 组件的所属关系
+
+组件的拥有者是设置其他组件 props 值的组件，注意只有组件之间是拥有关系，html 元素和组件之间是上下级关系。
 
 # 组件的设计
 
@@ -23,9 +56,21 @@ composability
 
 # 1.定义 state 和还是 props？
 
-state 是可变的，props 是不可变的，在设计组件时，组件自身要操纵一些变化才使用 state，否则都应该使用 props。
+state 是可变的，props 是不可变的，在设计组件时，组件自身要操纵一些变化才使用 state (例如响应用户输入，网络请求结果) ，否则都应该通过 props 渲染组件。
 
 改变 props 的工作交给组件调用者。
+
+尽可能使多数组件保持无状态，通过这样分离逻辑与减少冗余 (重复代码)，使应用程序更容易理解。最常见的模式是创建几个无状态的组件专门用于渲染数据，在他们的上方用一个有状态的组件将 state 传递给无状态组件的 `props`。有状态组件管理所有逻辑，无状态组件只关心如何根据数据渲染界面。
+
+### 什么应该放到 state？
+
+state 应该包含组件的事件处理函数中可能会改变而触发 UI 刷新的数据。在构建有状态组件时，将 state 表现为他所能代表的最小状态，并只将他们保存在 `this.state`。在 `render()` 中简单与其他基于这个 state 的信息共同计算。你将会发现这样的做法是最符合大多数正确程序的。添加额外的冗余操作或把计算后的值放在 state 中意味着你需要自己明确的保持同步而不是依赖 React 为你计算。
+
+### 什么不应该放到 state？
+
+- 计算后的数据：不要担心把 state 参与计算－他可以确保你的 UI 与你的计算结果与 `render()` 保持一致。例如，如果你有一列数组在 state 中，你想按顺序渲染成字符串，只需要在 render 中通过 `this.state.listItems.length + ' list items'` 计算结果，而不是计算后再放入 state 中。
+- React 组件：在 `render()` 中根据 props 和 state 的值渲染内容，而不是直接将他们方法 state。
+- 从 props 复制的数据：尽可能直接使用 props 的数据。将 props 值存到 state 中使用的一种有效的方式是需要知道以前的值，因此 props 可能会根据父组件重新渲染导致值发生变化。
 
 #  构建 HTML 的方式
 
@@ -53,7 +98,14 @@ return <div >{
     }</div>;
 
 ```
+
 注意数组中的每个组件都需要关键字 key
+
+### key 的作用
+
+假设你有一个组件，这个组件下面有两个按顺序排列的子组件，这两个子组件没有添加 key。那么当父组件重新渲染，需要改变子组件的顺序时，就会出现问题，可以是丢失内容 (Child Reconciliation) ，或者顺序错误，或者子组件被隐藏。
+
+也可以通过 ReactFragment 创建组件，这样就不用传递 key，[地址](https://facebook.github.io/react/docs/create-fragment.html)。
 
 
 # 写组件时明确设置默认值
